@@ -2,6 +2,7 @@ package it.prova.pokeronline.dto;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotBlank;
@@ -24,7 +25,6 @@ public class UtenteDTO {
 	@Size(min = 8, max = 15, message = "Il valore inserito deve essere lungo tra {min} e {max} caratteri")
 	private String password;
 
-	private String confermaPassword;
 
 	@NotBlank(message = "{nome.notblank}")
 	private String nome;
@@ -34,6 +34,10 @@ public class UtenteDTO {
 
 	private Date dateCreated;
 
+	private int esperienzaAccumulata;
+	
+	private int creditoAccumulato;
+	
 	private StatoUtente stato;
 
 	private Long[] ruoliIds;
@@ -47,6 +51,22 @@ public class UtenteDTO {
 		this.username = username;
 		this.nome = nome;
 		this.cognome = cognome;
+		this.stato = stato;
+	}
+
+	
+
+	public UtenteDTO(Long id,
+			 String username, String nome,String cognome, Date dateCreated, int esperienzaAccumulata,
+			int creditoAccumulato, StatoUtente stato) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.dateCreated = dateCreated;
+		this.esperienzaAccumulata = esperienzaAccumulata;
+		this.creditoAccumulato = creditoAccumulato;
 		this.stato = stato;
 	}
 
@@ -97,6 +117,22 @@ public class UtenteDTO {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+	
+	public int getEsperienzaAccumulata() {
+		return esperienzaAccumulata;
+	}
+
+	public void setEsperienzaAccumulata(int esperienzaAccumulata) {
+		this.esperienzaAccumulata = esperienzaAccumulata;
+	}
+
+	public int getCreditoAccumulato() {
+		return creditoAccumulato;
+	}
+
+	public void setCreditoAccumulato(int creditoAccumulato) {
+		this.creditoAccumulato = creditoAccumulato;
+	}
 
 	public StatoUtente getStato() {
 		return stato;
@@ -104,14 +140,6 @@ public class UtenteDTO {
 
 	public void setStato(StatoUtente stato) {
 		this.stato = stato;
-	}
-
-	public String getConfermaPassword() {
-		return confermaPassword;
-	}
-
-	public void setConfermaPassword(String confermaPassword) {
-		this.confermaPassword = confermaPassword;
 	}
 
 	public Long[] getRuoliIds() {
@@ -124,7 +152,7 @@ public class UtenteDTO {
 
 	public Utente buildUtenteModel(boolean includeIdRoles) {
 		Utente result = new Utente(this.id, this.username, this.password, this.nome, this.cognome,
-				this.dateCreated, this.stato);
+				this.dateCreated,this.esperienzaAccumulata,this.creditoAccumulato, this.stato);
 		if (includeIdRoles && ruoliIds != null)
 			result.setRuoli(Arrays.asList(ruoliIds).stream().map(id -> new Ruolo(id)).collect(Collectors.toSet()));
 
@@ -134,12 +162,19 @@ public class UtenteDTO {
 	// niente password...
 	public static UtenteDTO buildUtenteDTOFromModel(Utente utenteModel) {
 		UtenteDTO result = new UtenteDTO(utenteModel.getId(), utenteModel.getUsername(), utenteModel.getNome(),
-				utenteModel.getCognome(), utenteModel.getStato());
+				utenteModel.getCognome(),utenteModel.getDateCreated(),utenteModel.getEsperienzaAccumulata(),utenteModel.getCreditoAccumulato() ,utenteModel.getStato());
 
 		if (!utenteModel.getRuoli().isEmpty())
 			result.ruoliIds = utenteModel.getRuoli().stream().map(r -> r.getId()).collect(Collectors.toList())
 					.toArray(new Long[] {});
 
 		return result;
+	}
+	
+	public static List<UtenteDTO> createUtenteDTOListFromModelList(List<Utente> modelListInput) {
+		return modelListInput.stream().map(utenteEntity -> {
+			UtenteDTO result = UtenteDTO.buildUtenteDTOFromModel(utenteEntity);
+			return result;
+		}).collect(Collectors.toList());
 	}
 }

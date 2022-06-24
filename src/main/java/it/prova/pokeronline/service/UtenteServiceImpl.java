@@ -1,6 +1,7 @@
 package it.prova.pokeronline.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,11 +34,11 @@ public class UtenteServiceImpl implements UtenteService {
 	}
 
 	@Override
-	public void inserisciNuovo(Utente utenteInstance) {
+	public Utente inserisciNuovo(Utente utenteInstance) {
 		utenteInstance.setStato(StatoUtente.CREATO);
 		utenteInstance.setPassword(passwordEncoder.encode(utenteInstance.getPassword()));
 		utenteInstance.setDateCreated(new Date());
-		repository.save(utenteInstance);
+		return repository.save(utenteInstance);
 		
 	}
 
@@ -54,6 +55,49 @@ public class UtenteServiceImpl implements UtenteService {
 			utenteInstance.setStato(StatoUtente.DISABILITATO);
 		else if (utenteInstance.getStato().equals(StatoUtente.DISABILITATO))
 			utenteInstance.setStato(StatoUtente.ATTIVO);
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Utente> listAllUtenti() {
+		return (List<Utente>) repository.findAll();
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public Utente caricaSingoloUtenteConRuoli(Long id) {
+		return repository.findByIdConRuoli(id).orElse(null);
+	}
+
+
+	@Override
+	@Transactional
+	public void aggiorna(Utente utenteInstance) {
+		// deve aggiornare solo nome, cognome, username, ruoli
+		Utente utenteReloaded = repository.findById(utenteInstance.getId()).orElse(null);
+		if (utenteReloaded == null)
+			throw new RuntimeException("Elemento non trovato");
+		utenteReloaded.setNome(utenteInstance.getNome());
+		utenteReloaded.setCognome(utenteInstance.getCognome());
+		utenteReloaded.setUsername(utenteInstance.getUsername());
+		utenteReloaded.setRuoli(utenteInstance.getRuoli());
+		repository.save(utenteReloaded);
+	}
+
+
+	@Override
+	@Transactional
+	public void rimuovi(Utente utenteInstance) {
+		repository.delete(utenteInstance);
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Utente> findByExample(Utente example) {
+		return repository.findByExample(example);
 	}
 	
 }

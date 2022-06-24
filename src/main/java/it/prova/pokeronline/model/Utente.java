@@ -70,8 +70,20 @@ public class Utente {
 			this.id = id;
 			this.stato = stato;
 		}
-
 		
+		public Utente(Long id, String username, String password, String nome, String cognome, Date dateCreated,
+				int esperienzaAccumulata, int creditoAccumulato, StatoUtente stato) {
+			this.id = id;
+			this.username = username;
+			this.password = password;
+			this.nome = nome;
+			this.cognome = cognome;
+			this.dateCreated = dateCreated;
+			this.esperienzaAccumulata = esperienzaAccumulata;
+			this.creditoAccumulato = creditoAccumulato;
+			this.stato = stato;
+		}
+
 		public Long getId() {
 			return id;
 		}
@@ -126,6 +138,24 @@ public class Utente {
 
 		public void setDateCreated(Date dateCreated) {
 			this.dateCreated = dateCreated;
+		}
+
+		
+		
+		public int getEsperienzaAccumulata() {
+			return esperienzaAccumulata;
+		}
+
+		public void setEsperienzaAccumulata(int esperienzaAccumulata) {
+			this.esperienzaAccumulata = esperienzaAccumulata;
+		}
+
+		public int getCreditoAccumulato() {
+			return creditoAccumulato;
+		}
+
+		public void setCreditoAccumulato(int creditoAccumulato) {
+			this.creditoAccumulato = creditoAccumulato;
 		}
 
 		public StatoUtente getStato() {

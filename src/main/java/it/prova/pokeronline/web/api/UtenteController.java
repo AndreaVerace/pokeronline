@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.prova.gestionetratte.web.api.exception.AirbusNotFoundException;
 import it.prova.pokeronline.dto.UtenteDTO;
 import it.prova.pokeronline.model.StatoUtente;
 import it.prova.pokeronline.model.Utente;
@@ -110,6 +109,11 @@ public class UtenteController {
 		utenteInput.setId(id);
 		Utente utenteAggiornato = utenteService.aggiorna(utenteInput.buildUtenteModel(true));
 		return UtenteDTO.buildUtenteDTOFromModel(utenteAggiornato);
+	}
+	
+	@PostMapping("/search")
+	public List<UtenteDTO> search(@RequestBody UtenteDTO example) {
+		return UtenteDTO.createUtenteDTOListFromModelList(utenteService.findByExample(example.buildUtenteModel(true)));
 	}
 	
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.prova.pokeronline.dto.UtenteDTO;
+import it.prova.pokeronline.model.StatoUtente;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.security.dto.UtenteInfoJWTResponseDTO;
 import it.prova.pokeronline.service.UtenteService;
@@ -73,4 +74,17 @@ public class UtenteController {
 		Utente utenteInserito = utenteService.inserisciNuovo(utenteInput.buildUtenteModel(true));
 		return UtenteDTO.buildUtenteDTOFromModel(utenteInserito);
 	}
+
+	
+	@PostMapping("/abilita/{id}")
+	public UtenteDTO abilita(@PathVariable(value = "id", required = true) long id) {
+		Utente utenteInput = utenteService.caricaSingoloUtente(id);
+		if(utenteInput == null)
+			throw new UtenteNotFoundException("Utente not found con id:" + id);
+		
+		utenteInput.setStato(StatoUtente.ATTIVO);
+		utenteService.aggiorna(utenteInput);
+		return UtenteDTO.buildUtenteDTOFromModel(utenteInput);
+	}
+
 }

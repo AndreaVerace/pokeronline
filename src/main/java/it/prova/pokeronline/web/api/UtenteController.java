@@ -87,4 +87,15 @@ public class UtenteController {
 		return UtenteDTO.buildUtenteDTOFromModel(utenteInput);
 	}
 
+	@PostMapping("/disabilita/{id}")
+	public UtenteDTO disabilita(@PathVariable(value = "id", required = true) long id) {
+		Utente utenteInput = utenteService.caricaSingoloUtente(id);
+		if(utenteInput == null)
+			throw new UtenteNotFoundException("Utente not found con id:" + id);
+		
+		utenteInput.setStato(StatoUtente.DISABILITATO);
+		utenteService.aggiorna(utenteInput);
+		return UtenteDTO.buildUtenteDTOFromModel(utenteInput);
+	}
+	
 }

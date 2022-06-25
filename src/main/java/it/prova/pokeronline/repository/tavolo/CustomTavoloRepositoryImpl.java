@@ -23,7 +23,7 @@ public class CustomTavoloRepositoryImpl implements CustomTavoloRepository {
 		Map<String, Object> paramaterMap = new HashMap<String, Object>();
 		List<String> whereClauses = new ArrayList<String>();
 
-		StringBuilder queryBuilder = new StringBuilder("select t from tavolo t where t.id = t.id ");
+		StringBuilder queryBuilder = new StringBuilder("select t from Tavolo t where t.id = t.id ");
 
 		if (StringUtils.isNotEmpty(example.getDenominazione())) {
 			whereClauses.add(" t.denominazione  like :denominazione ");
@@ -34,13 +34,10 @@ public class CustomTavoloRepositoryImpl implements CustomTavoloRepository {
 			paramaterMap.put("dataCreazione", example.getDataCreazione());
 		}
 		if (example.getUtenteCreazione() != null) {
-			whereClauses.add(" t.utenteCreazione = :utenteCreazione ");
+			whereClauses.add(" t.utenteCreazione like :utenteCreazione ");
 			paramaterMap.put("utenteCreazione", example.getUtenteCreazione());
 		}
-		if (example.getEsperienzaMinima() >= 0) {
-			whereClauses.add(" t.esperienzaMinima >= :esperienzaMinima ");
-			paramaterMap.put("esperienzaMinima", example.getEsperienzaMinima());
-		}
+		
 		if (example.getCifraMinima() >= 0) {
 			whereClauses.add(" t.cifraMinima >= :cifraMinima ");
 			paramaterMap.put("cifraMinima", example.getCifraMinima());

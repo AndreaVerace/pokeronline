@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,5 +76,21 @@ public class TavoloController {
 			Tavolo tavoloAggiornato = tavoloService.aggiorna(tavoloInput.buildTavoloModel(true));
 			return TavoloDTO.buildTavoloDTOFromModel(tavoloAggiornato);
 		}
+		
+		@PostMapping("/search")
+		public List<TavoloDTO> search(@RequestBody TavoloDTO example) {
+			return TavoloDTO.createTavoloDTOListFromModelList(tavoloService.findByExample(example.buildTavoloModel(true)));
+		}
 	
+		@DeleteMapping("/{id}")
+		@ResponseStatus(HttpStatus.OK)
+		public void delete(@PathVariable(required = true) Long id) {
+			Tavolo tavolo = tavoloService.caricaSingoloTavolo(id);
+
+			if (tavolo == null)
+				throw new TavoloNotFoundException("tavolo not found con id: " + id);
+
+			tavoloService.rimuovi(tavolo);
+		}
+		
 }

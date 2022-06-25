@@ -78,4 +78,28 @@ public class PlayManagementController {
 		
 	}
 	
+	@GetMapping("/giocaPartita")
+	public UtenteDTO giocaPartita() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+		int creditoTotale = utenteLoggato.getCreditoAccumulato();
+		
+		double segno = Math.random();
+		
+		if(segno >= 0.5) {
+			utenteLoggato.setCreditoAccumulato(creditoTotale + (int)(segno*1000));
+		}
+		else {
+			utenteLoggato.setCreditoAccumulato(creditoTotale - (int)(segno * 1000));
+			if(creditoTotale < 0)
+				utenteLoggato.setCreditoAccumulato(0);
+		}
+		
+		
+		utenteService.aggiorna(utenteLoggato);
+		
+		return UtenteDTO.buildUtenteDTOFromModel(utenteLoggato);
+	}
+	
 }

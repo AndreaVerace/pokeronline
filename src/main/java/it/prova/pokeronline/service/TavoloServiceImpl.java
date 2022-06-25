@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.prova.pokeronline.model.Tavolo;
+import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.repository.tavolo.TavoloRepository;
 import it.prova.pokeronline.web.api.exception.CustomException;
 
@@ -37,6 +38,12 @@ public class TavoloServiceImpl implements TavoloService {
 	@Override
 	@Transactional
 	public Tavolo inserisciNuovo(Tavolo tavoloInstance) {
+		
+
+		for(Utente u : tavoloInstance.getUtentiTavolo()) {
+			u.setEsperienzaAccumulata(u.getEsperienzaAccumulata() + 1);
+		}
+		
 		return repository.save(tavoloInstance);
 	}
 

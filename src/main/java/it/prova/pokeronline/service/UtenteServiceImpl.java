@@ -34,6 +34,7 @@ public class UtenteServiceImpl implements UtenteService {
 	}
 
 	@Override
+	@Transactional
 	public Utente inserisciNuovo(Utente utenteInstance) {
 		utenteInstance.setStato(StatoUtente.CREATO);
 		utenteInstance.setPassword(passwordEncoder.encode(utenteInstance.getPassword()));

@@ -51,6 +51,14 @@ public class Utente {
 		public Utente() {
 		}
 
+		
+		
+		public Utente(Long id) {
+			this.id = id;
+		}
+
+
+
 		public Utente(String username, String password) {
 			super();
 			this.username = username;
@@ -173,7 +181,15 @@ public class Utente {
 			}
 			return false;
 		}
-
+		
+		public boolean isSpecialPlayer() {
+			for (Ruolo ruoloItem : ruoli) {
+				if (ruoloItem.getCodice().equals(Ruolo.ROLE_SPECIAL_PLAYER))
+					return true;
+			}
+			return false;
+		}
+		
 		public boolean isAttivo() {
 			return this.stato != null && this.stato.equals(StatoUtente.ATTIVO);
 		}

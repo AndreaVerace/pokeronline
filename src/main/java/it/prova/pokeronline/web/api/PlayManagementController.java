@@ -49,8 +49,20 @@ public class PlayManagementController {
 			} 
 		}
 		return null;
-		
-		
 	}
 	
+	
+	@GetMapping("/abbandona")
+	public String abbandona() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+		
+		for(Tavolo tavoloItem : tavoloService.listAllTavoli()) {
+			if(tavoloItem.getUtentiTavolo().contains(utenteLoggato)) {
+				tavoloItem.getUtentiTavolo().remove(utenteLoggato);
+				return "Hai abbandonato la partita.";
+			}
+		}
+		return "Non sei presente in nessuna partita.";
+	}
 }

@@ -21,4 +21,6 @@ public interface TavoloService {
 	public List<Tavolo> findByExample(Tavolo example);
 	
 	public List<Tavolo> findtavoloDiUtente(String descrizione,String username);
+	
+	public List<Tavolo> findAllByEsperienzaMinimaLessThanEqual(int esperienzaMinimaRichiesta);
 }

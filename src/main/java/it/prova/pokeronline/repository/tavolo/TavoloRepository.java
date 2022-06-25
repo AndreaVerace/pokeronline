@@ -16,4 +16,6 @@ public interface TavoloRepository extends CrudRepository<Tavolo, Long>,CustomTav
 			+ " where r.descrizione like ?1 and u.username like ?2")
 	List<Tavolo> findtavoloDiUtente(String descrizione,String username);
 	
+	List<Tavolo> findAllByEsperienzaMinimaLessThanEqual(int esperienzaMinimaRichiesta);
+	
 }

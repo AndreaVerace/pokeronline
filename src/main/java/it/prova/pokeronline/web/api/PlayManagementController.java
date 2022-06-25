@@ -1,5 +1,7 @@
 package it.prova.pokeronline.web.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,4 +67,15 @@ public class PlayManagementController {
 		}
 		return "Non sei presente in nessuna partita.";
 	}
+	
+	@GetMapping("/ricercaPartite")
+	public List<TavoloDTO> ricercaPartite(){
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+		
+		return TavoloDTO.createTavoloDTOListFromModelList(tavoloService.findAllByEsperienzaMinimaLessThanEqual(utenteLoggato.getEsperienzaAccumulata()));
+		
+	}
+	
 }

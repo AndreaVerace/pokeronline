@@ -76,4 +76,9 @@ public class TavoloServiceImpl implements TavoloService {
 		return repository.findtavoloDiUtente(descrizione, username);
 	}
 
+	@Override
+	public List<Tavolo> findAllByEsperienzaMinimaLessThanEqual(int esperienzaMinimaRichiesta) {
+		return repository.findAllByEsperienzaMinimaLessThanEqual(esperienzaMinimaRichiesta);
+	}
+
 }

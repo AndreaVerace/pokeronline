@@ -25,6 +25,7 @@ import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.service.TavoloService;
 import it.prova.pokeronline.service.UtenteService;
+import it.prova.pokeronline.web.api.exception.CustomException;
 import it.prova.pokeronline.web.api.exception.IdNotNullForInsertException;
 import it.prova.pokeronline.web.api.exception.TavoloNotFoundException;
 import it.prova.pokeronline.web.api.exception.UtenteNotFoundException;
@@ -62,6 +63,16 @@ public class TavoloController {
 				throw new IdNotNullForInsertException("Non è ammesso fornire un id per la creazione");
 			
 			Tavolo tavoloInserito = tavoloService.inserisciNuovo(tavoloInput.buildTavoloModel(true));
+			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+			
+			if(utenteLoggato.isSpecialPlayer()) {
+				TavoloDTO.buildTavoloDTOFromModel(tavoloInserito);
+				tavoloInserito.setUtenteCreazione(utenteLoggato);
+				return TavoloDTO.buildTavoloDTOFromModel(tavoloInserito);
+			}
+			
 			return TavoloDTO.buildTavoloDTOFromModel(tavoloInserito);
 		}
 	
@@ -73,13 +84,35 @@ public class TavoloController {
 				throw new TavoloNotFoundException("Tavolo not found con id: " + id);
 
 			tavoloInput.setId(id);
+			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+			
+			if(utenteLoggato.isSpecialPlayer()) {
+				if(tavoloInput.getUtenteCreazione().getId() == utenteLoggato.getId()) {
+					Tavolo tavoloAggiornato = tavoloService.aggiorna(tavoloInput.buildTavoloModel(true));
+					return TavoloDTO.buildTavoloDTOFromModel(tavoloAggiornato);
+				}
+				else {
+					throw new CustomException("Non puoi modificare tavoli di cui non sei il creatore.");
+				}
+			}
+			
 			Tavolo tavoloAggiornato = tavoloService.aggiorna(tavoloInput.buildTavoloModel(true));
 			return TavoloDTO.buildTavoloDTOFromModel(tavoloAggiornato);
 		}
 		
 		@PostMapping("/search")
 		public List<TavoloDTO> search(@RequestBody TavoloDTO example) {
-			return TavoloDTO.createTavoloDTOListFromModelList(tavoloService.findByExample(example.buildTavoloModel(true)));
+			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+			
+			if(utenteLoggato.isSpecialPlayer()) {
+				
+			}
+			
+			return TavoloDTO.createTavoloDTOListFromModelList(tavoloService.findByExample(example.buildTavoloModel(false)));
 		}
 	
 		@DeleteMapping("/{id}")
@@ -90,6 +123,18 @@ public class TavoloController {
 			if (tavolo == null)
 				throw new TavoloNotFoundException("tavolo not found con id: " + id);
 
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
+			
+			if(utenteLoggato.isSpecialPlayer()) {
+				if(tavolo.getUtenteCreazione().getId() == utenteLoggato.getId()) {
+					tavoloService.rimuovi(tavolo);
+				}
+				else {
+					throw new CustomException("Non puoi eliminare tavoli di cui non sei il creatore.");
+				}
+			}	
+			
 			tavoloService.rimuovi(tavolo);
 		}
 		

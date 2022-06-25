@@ -17,6 +17,7 @@ import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.service.TavoloService;
 import it.prova.pokeronline.service.UtenteService;
+import it.prova.pokeronline.web.api.exception.CustomException;
 
 @RestController
 @RequestMapping("/api/playManagement")
@@ -78,24 +79,34 @@ public class PlayManagementController {
 		
 	}
 	
-	@GetMapping("/giocaPartita")
-	public UtenteDTO giocaPartita() {
+	@PostMapping("/giocaPartita/{id}")
+	public UtenteDTO giocaPartita(@PathVariable(required = true) Long id) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Utente utenteLoggato =  utenteService.findByUsername(auth.getName());
 		int creditoTotale = utenteLoggato.getCreditoAccumulato();
+		Tavolo tavolo = tavoloService.caricaSingoloTavolo(id);
 		
-		double segno = Math.random();
-		
-		if(segno >= 0.5) {
-			utenteLoggato.setCreditoAccumulato(creditoTotale + (int)(segno*1000));
+		if(tavolo.getUtentiTavolo().contains(utenteLoggato)) {
+			if(utenteLoggato.getCreditoAccumulato() >= tavolo.getCifraMinima()) {
+				double segno = Math.random();
+				
+				if(segno >= 0.5) {
+					utenteLoggato.setCreditoAccumulato(creditoTotale + (int)(segno*1000));
+				}
+				else {
+					utenteLoggato.setCreditoAccumulato(creditoTotale - (int)(segno * 1000));
+					if(creditoTotale < 0)
+						utenteLoggato.setCreditoAccumulato(0);
+				}
+			}
+			else {
+				throw new CustomException("Non puoi giocare a questo tavolo piochè non hai abbstanza credito.");
+			}
 		}
 		else {
-			utenteLoggato.setCreditoAccumulato(creditoTotale - (int)(segno * 1000));
-			if(creditoTotale < 0)
-				utenteLoggato.setCreditoAccumulato(0);
+			throw new CustomException("Non puoi giocare ad un tavolo in cui non sei stato invitato");
 		}
-		
 		
 		utenteService.aggiorna(utenteLoggato);
 		
